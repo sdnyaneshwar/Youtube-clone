@@ -7,11 +7,14 @@
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
-  
   "keywords": [
     "javascript",
     "backend"
   ],
   "author": "Dnyaneshwar Suwarnkar",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5"
+  }
 }
