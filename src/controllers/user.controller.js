@@ -448,12 +448,41 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
                 {
                     $lookup:{
                         from:"users",
-                        localField:_"
+                        localField:"owner",
+                        foreignField:"_id",
+                        as:"owner",
+                        pipeline:[
+                            {
+                                $project:{
+                                    fullName:1,
+                                    username:1,
+                                    avatar:1
+                                     
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    $addFields:{
+                        owner:{
+                            $first:"$owner"
+                        }
                     }
                 }
             ]
         }
     })
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user[0].watchHistory,
+            " wWatch history fetch successfully "
+        )
+    )
 })
 
 export {registerUser ,
@@ -466,6 +495,7 @@ export {registerUser ,
         updateUserAvatar,
         updateUserCoverImage,
         getUserChannelDetails,
+        getWatchHistory
 
 
     }
