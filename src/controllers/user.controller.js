@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponce.js";
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken= async(userId)=>{
     try {
@@ -270,7 +271,7 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
 const getCurrentUser = asyncHandler(async(req,res)=>{
     return res
     .status(200)
-    .json(200 , req.user ,"Current user fetched successfully")
+    .json(new ApiResponse(200 , req.user ,"Current user fetched successfully"))
 })
 
 const updateAccountDetails = asyncHandler(async(req,res)=>{
@@ -357,6 +358,103 @@ const updateUserCoverImage = asyncHandler(async(req,res)=>{
     )
 })
 
+const getUserChannelDetails = asyncHandler(async(req,res)=>{
+    const {username} = req.params
+    if(!username?.trim){
+        throw new ApiError(400, "username is missing")
+    }
+
+    const channel = await User.aggregate([
+        {
+            $match:{
+                username:username?.toLowerCase()
+
+            }
+        },
+        {                                           //we get all channels of user
+            $lookup:{
+                from:"subscriptions",  // from subcription module and in lowercase and plurel
+                localField:"_id",
+                foreignField:"channel",
+                as:"subscribers"
+            }
+        },
+        {                                        // we get all subscriber of user
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"subscriber",
+                as:"subscribedTo"
+            }
+        },
+        {
+            $addFields:{
+                subscriberCounts:{
+                    $size: "$subscribers"    // count of all channels and  use $ because it is field
+                },
+                channelsSubscribedToCount:{
+                   $size:"$subscribedTo"              // count of all subscribers and  use $ because it is field
+                },
+                isSubscribed:{
+                    $cond:{
+                        if:{$in:[req.user?._id,"$subscribers.subscriber"]},
+                        then:true,
+                        else:false
+                    }
+                }
+            }
+        },{
+            $project:{
+                fullName : 1,
+                username : 1,
+                subscriberCounts : 1,
+                channelsSubscribedToCount : 1,
+                isSubscribed : 1,
+                avatar : 1,
+                coverImage : 1,
+                email : 1
+
+
+
+            }
+        }
+    ])
+
+    if(!channel?.length){
+        throw new ApiError(404, "channel does not exist")
+    }
+
+    return res
+    .status(200)
+    .json(200 ,
+         channel[0],
+          "User channel fetch successfully"
+         )
+})
+
+const getWatchHistory = asyncHandler(async(req,res)=>{
+    const user =await User.aggregate({
+        $match:{    //get user
+            _id:new mongoose.Types.ObjectId(req.user.id)
+        }
+    },
+    {
+        $lookup:{
+            from:"videos",
+            localField:"watchHistory",
+            foreignField:"_id",
+            as:"watchHistory",
+            pipeline:[
+                {
+                    $lookup:{
+                        from:"users",
+                        localField:_"
+                    }
+                }
+            ]
+        }
+    })
+})
 
 export {registerUser ,
      loginUser ,
@@ -366,6 +464,8 @@ export {registerUser ,
         getCurrentUser,
         updateAccountDetails,
         updateUserAvatar,
-        updateUserCoverImage
+        updateUserCoverImage,
+        getUserChannelDetails,
+
 
     }
