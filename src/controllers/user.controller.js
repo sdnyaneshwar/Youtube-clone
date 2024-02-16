@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.model.js"
+import { Video } from "../models/video.model.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponce.js";
 import jwt from "jsonwebtoken"
@@ -42,7 +43,7 @@ const registerUser = asyncHandler( async (req, res) => {
     //check for user creaton
     // return response
 
-    const {fullName, email, username,password}=req.body
+    const {fullName, email, username,password} = req.body
     console.log("email : ",email)
     
     if( 
@@ -89,6 +90,7 @@ const registerUser = asyncHandler( async (req, res) => {
         username: username.toLowerCase()
     })
 
+
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
         )
@@ -113,7 +115,6 @@ const loginUser = asyncHandler( async(req,res)=>{
     // res successfully login
 
     const { email,username,password} = req.body
-    console.log(req.body)
     if(!username && !email){
         throw new ApiError(400, "username or password is required")
     }
@@ -121,6 +122,12 @@ const loginUser = asyncHandler( async(req,res)=>{
     const user = await User.findOne({
         $or:[{username} , {email}]
     })
+    // const user = await User.findOne({
+    //     $or: [
+    //         { username: { $regex: new RegExp(username, 'i') } },
+    //         { email: { $regex: new RegExp(email, 'i') } }
+    //     ]
+    // });
 
     if(!user){
         throw new ApiError(400,"User does not exist")
@@ -137,7 +144,6 @@ const loginUser = asyncHandler( async(req,res)=>{
     const loggedInUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
-    console.log(loggedInUser)
     const options ={
         httpOnly:true,
         secure:true
@@ -174,18 +180,18 @@ const loginUser = asyncHandler( async(req,res)=>{
 })
 
 const logOutUser = asyncHandler( async(req,res)=>{
-    await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set : {
-                refreshToken:undefined
+            $unset : {
+                refreshToken:1
             }
         },
         {
             new:true
         }
     )
-
+    console.log(user)
     const options ={
         httpOnly:true,
         secure:true
@@ -194,7 +200,7 @@ const logOutUser = asyncHandler( async(req,res)=>{
     .status(200)
     .clearCookie("accessToken",options)
     .clearCookie("refreshToken",options)
-    .json(new ApiResponse(200, {},"User logged Out"))
+    .json(new ApiResponse(200, user,"User logged Out"))
 })
 
 const refreshAccessToken = asyncHandler( async (req,res) =>{
@@ -206,7 +212,7 @@ const refreshAccessToken = asyncHandler( async (req,res) =>{
 
    try {
     const decodedToken = jwt.verify(incomingRefreshToken , process.env.REFRESH_TOKEN_SECRET)
-    
+    console.log("deccoded token : ",decodedToken)
     const user = await User.findById(decodedToken?._id)
  
     if(!user){
@@ -245,7 +251,7 @@ const refreshAccessToken = asyncHandler( async (req,res) =>{
 })
 
 const changeCurrentPassword = asyncHandler(async(req,res)=>{
-   const {oldPassword ,newPassword}= req.body
+   const {oldPassword , newPassword}= req.body
 
    const user = await User.findById(req.user._id) // add user in user middleware
    
@@ -255,7 +261,7 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
     throw new ApiError(201,)
    }
 
-   user.password =password;
+   user.password = newPassword;
    user.save({validateBeforeSave:false}) // when user password .save then it call the pre function inside the usermodel
 
    return res
@@ -363,7 +369,7 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
     if(!username?.trim){
         throw new ApiError(400, "username is missing")
     }
-
+    console.log(username)
     const channel = await User.aggregate([
         {
             $match:{
@@ -423,19 +429,21 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
     if(!channel?.length){
         throw new ApiError(404, "channel does not exist")
     }
+    console.log(channel);
 
     return res
     .status(200)
-    .json(200 ,
+    .json(2000 ,
          channel[0],
           "User channel fetch successfully"
          )
 })
 
 const getWatchHistory = asyncHandler(async(req,res)=>{
-    const user =await User.aggregate({
-        $match:{    //get user
-            _id:new mongoose.Types.ObjectId(req.user.id)
+    //get user
+    const user = await User.aggregate([{
+        $match:{    
+            _id:new mongoose.Types.ObjectId(req.user._id)  
         }
     },
     {
@@ -472,7 +480,9 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
                 }
             ]
         }
-    })
+    }])
+
+    console.log(user[0].watchHistory);
 
     return res
     .status(200)
