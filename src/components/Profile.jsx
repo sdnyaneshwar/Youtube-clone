@@ -29,8 +29,8 @@ const Profile = () => {
         <ul className=''>
           {
             options.map((option,index)=>(
-              <Link to={option.to}>
-              <li key={index} className='py-2 pl-2 pr-6 rounded-lg hover:bg-slate-50 hover:border-slate-200'>{option.name}</li>
+              <Link key={index} to={option.to}>
+              <li  className='py-2 pl-2 pr-6 rounded-lg hover:bg-slate-50 hover:border-slate-200'>{option.name}</li>
               </Link>
             ))
           }

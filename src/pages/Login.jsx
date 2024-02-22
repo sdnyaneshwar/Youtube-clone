@@ -32,7 +32,7 @@ const Login = () => {
                 document.cookie = `accessToken=${accessToken}; Secure; SameSite=None`; // Set Secure and SameSite attributes for security
                 document.cookie = `refreshToken=${refreshToken}; Secure; SameSite=None`; // Set Secure and SameSite attributes for security
             
-                let userData = response.data.data;
+                let userData = response.data.data.user;
                 datal(login(userData))
                 navigate('/');
             })

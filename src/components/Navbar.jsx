@@ -15,7 +15,7 @@ const Navbar = () => {
   const userData = useSelector((state) => state.auth.userData)
   const userstatus = useSelector((state) => state.auth.status)
   
-  
+  console.log(userData);
   const navigate = useNavigate()
   const [profile, setprofile] = useState(false)
   const dispatch = useDispatch()
@@ -48,9 +48,11 @@ const Navbar = () => {
         }
 
 
-        <div className='px-5 py-3 font-extrabold text-white bg-indigo-800 rounded-2xl' onClick={()=>dispatch(getallVideos())}>
+       <Link to={'/'}>
+       <div className='px-5 py-3 font-extrabold text-white bg-indigo-800 rounded-2xl' onClick={()=>dispatch(getallVideos())}>
           CHITRATUBE
         </div>
+       </Link>
         <div className='p-2 border border-blue-400 rounded-full hover:shadow-lg'>
           <input type="text" className='' />
           <span className='font-semibold text-green-500 cursor-pointer hover:text-indigo-500'>search</span>
@@ -61,7 +63,7 @@ const Navbar = () => {
           userstatus ? <div className='flex '>
 
             <div>
-              hii {userData.user.fullName}
+              hii {userData.fullName}
             </div>
 
             <div className='px-4 py-2' onClick={logoutHandle}>
@@ -69,7 +71,7 @@ const Navbar = () => {
 
             </div>
             <div onClick={() => setprofile(prev => !prev)}>
-              <img className="w-10 h-10 rounded-full" src={userData.user.avatar} alt="Rounded avatar"></img>
+              <img className="w-10 h-10 rounded-full" src={userData.avatar} alt="Rounded avatar"></img>
             </div>
             <div className='flex-col ml-3 mr-5'>
               <div className='absolute mt-1 top-[100%] right-6'>
