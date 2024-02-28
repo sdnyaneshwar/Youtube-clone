@@ -8,7 +8,7 @@ import { ApiResponse } from "../utils/ApiResponce.js";
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    //const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     const videos = await Video.find({})
 
     console.log(videos)
@@ -50,13 +50,19 @@ const publishAVideo = asyncHandler(async(req,res)=>{
      }
      const videoFile = await uploadOnCloudinary(videoFileLocalpath)
      const thumbnail =  await uploadOnCloudinary(thumbnailLocalpath)
-     console.log(videoFile.duration);
+     console.log(videoFile);
+     if(!(videoFile)){
+        throw new ApiError(
+            400,"File is not uploaded on cloudinary"
+        )
+     }
      const video = await Video.create({
         videoFile:videoFile.url,
         thumbnail:thumbnail.url,
         title,
         description,
         owner:req.user._id,
+        avatar:req.user.avatar,
         isPublished:true,
         duration:videoFile.duration
      })
@@ -189,6 +195,10 @@ const deleteVideo = asyncHandler(async(req,res)=>{
     )
 
  })
+
+const getUsersAllVideo = asyncHandler(async(req,res)=>{
+    
+})
 
 
 

@@ -63,7 +63,7 @@ router.route("/avatar").patch(verifyJWT , upload.single("avatar"),updateUserAvat
 
 router.route("/cover-image").patch(verifyJWT, upload.single("coverImage"),updateUserCoverImage)
 
-router.route("/c/:username").get(verifyJWT,getUserChannelProfile)
+router.route("/c/:identifier").get(verifyJWT,getUserChannelProfile)
 // http://localhost:8000/api/v1/users/c/dany
 router.route("/history").get(verifyJWT , getWatchHistory)
 

@@ -115,6 +115,7 @@ const loginUser = asyncHandler( async(req,res)=>{
     // res successfully login
 
     const { email,username,password} = req.body
+    console.log(email);
     if(!username && !email){
         throw new ApiError(400, "username or password is required")
     }
@@ -122,12 +123,8 @@ const loginUser = asyncHandler( async(req,res)=>{
     const user = await User.findOne({
         $or:[{username} , {email}]
     })
-    // const user = await User.findOne({
-    //     $or: [
-    //         { username: { $regex: new RegExp(username, 'i') } },
-    //         { email: { $regex: new RegExp(email, 'i') } }
-    //     ]
-    // });
+    
+    console.log(user);
 
     if(!user){
         throw new ApiError(400,"User does not exist")
@@ -148,21 +145,9 @@ const loginUser = asyncHandler( async(req,res)=>{
         httpOnly:true,
         secure:true
     }
-    // return res
-    // .status(200)
-    // .cookie("accessToken",accessToken,options)
-    // .cookie("refreshToken",refreshToken,options)
-    // .json(
-    //     new ApiResponse(
-    //         200,
-    //         {
-    //             user : loggedInUser , accessToken , refreshToken
-    //         },
-    //         "User logged In Successfully"
-    //     )
-    // )
+   
     return res
-    .status(300)
+    .status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
@@ -180,6 +165,7 @@ const loginUser = asyncHandler( async(req,res)=>{
 })
 
 const logOutUser = asyncHandler( async(req,res)=>{
+    console.log("here");
     const user = await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -274,6 +260,7 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
 
 })
 
+
 const getCurrentUser = asyncHandler(async(req,res)=>{
     return res
     .status(200)
@@ -310,6 +297,7 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
 
 const updateUserAvatar = asyncHandler(async(req,res)=>{
     const avatarLocalPath = req.file?.path
+    
 
     if(!avatarLocalPath){
         throw new ApiError(400 , "Avatar file is missing")
@@ -365,17 +353,20 @@ const updateUserCoverImage = asyncHandler(async(req,res)=>{
 })
 
 const getUserChannelProfile = asyncHandler(async(req,res)=>{
-    const {username} = req.params
-    if(!username?.trim){
-        throw new ApiError(400, "username is missing")
+    const { identifier } = req.params;
+    console.log("identifier: ", identifier);
+   
+    // Logic to determine if identifier is a username or ownerId
+    let matchCondition;
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+        matchCondition = { _id: new mongoose.Types.ObjectId(identifier)};
+    } else {
+        matchCondition = { username: identifier?.toLowerCase() };
     }
-    console.log(username)
+    
     const channel = await User.aggregate([
         {
-            $match:{
-                username:username?.toLowerCase()
-
-            }
+            $match:matchCondition
         },
         {                                           //we get all channels of user
             $lookup:{
@@ -433,9 +424,11 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
 
     return res
     .status(200)
-    .json(2000 ,
+    .json(new ApiResponse(
+        2000 ,
          channel[0],
           "User channel fetch successfully"
+    )
          )
 })
 
