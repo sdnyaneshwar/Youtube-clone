@@ -10,18 +10,50 @@ const PlayVideo = () => {
     let _id = param.videoId;
     const [video, setVideo] = useState({})
     const [key, setkey] = useState(0)
-    console.log(_id);
-    console.log();
-
-    
+    const [owner, setOwner] = useState({})
+    const [description , setDescription] = useState(false)
 
 
+
+    const subscribeHandle = () =>{
+        if(owner){
+            axios.post(`http://localhost:8000/api/v1/users/c/${owner}`,null,
+            {
+                withCredentials:true
+            }).then((response)=>{
+                console.log(response.data);
+            }).catch((error)=>{
+                console.log(error.message);
+            })
+        }
+    }
+
+
+    const getUserProfile = () => {
+        if (video.owner) {
+            const ownerId = video.owner;
+            const username= undefined;
+            console.log(ownerId);
+            axios.get(`http://localhost:8000/api/v1/users/c/${ownerId}`, {
+                withCredentials: true
+            })
+                .then((response) => {
+                    const data = response.data.data;
+                    setOwner(data);
+                    console.log(data);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                });
+        }
+    };
 
     useEffect(() => {
         axios.get(`http://localhost:8000/api/v1/videos/${_id}`, {
             withCredentials: true
         }).then((responce) => {
-            console.log(responce.data);
+            console.log(responce.data.data);
+
             setVideo(responce.data.data);
             setkey(prev => prev + 1)
 
@@ -29,8 +61,18 @@ const PlayVideo = () => {
         }).catch((error) => {
             console.log(error.message);
         })
+
+        getUserProfile()
     }, [_id])
-    console.log(video.videoFile);
+
+
+    useEffect(() => {
+        if (video.owner) {
+            getUserProfile();
+        }
+    }, [video.owner])
+
+
     return (
         <div key={key} className='w-full h-screen overflow-hidden'>
             <div className='sticky top-0 z-50 h-[15%]'>
@@ -52,13 +94,46 @@ const PlayVideo = () => {
                                 </video> */}
                             </div>
                             <div className='p-3 bg-yellow-300 rounded-lg mt'>
-                                    <select name="information" id="">
-                                        <option value="">Discription</option>
-                                    </select>
-                                <div>
+                                <div className='w-[100%] flex gap-4 items-center'>
+                                    <div>
+                                        <img className="w-10 h-10 rounded-full" src={owner.avatar} alt="Rounded avatar"></img>
+                                    </div>
+                                    <div className='items-center text-center '>
+                                        <h1 className='items-center font-bold'>{video.title}</h1>
+
+                                    </div>
+                                </div>
+                                <div className='w-[100%] flex gap-4 items-center justify-between'>
+                                    <div>
+                                        <nav>viwes {video.views}</nav>
+                                    </div>
+                                    <div className='p-2 text-white rounded-full bg-indigo-950' onClick={()=>subscribeHandle}>
+                                        Subscriber  {owner.subscriberCounts}
+                                    </div>
+                                </div>
+                                <div className='w-[100%] flex gap-4 items-center'>
+                                    <div>
+
+                                    </div>
+                                    <div>
+
+                                    </div>
                                 </div>
                             </div>
-                            <div className='h-full p-3 bg-green-400 rounded-lg'>
+                            
+                            <div className='p-3 bg-yellow-300 rounded-lg mt'>
+                                <div className={`${description? "bg-slate-400 p-3":"p-3 bg-slate-400  w-fit"}`} onClick={()=>setDescription(prev=>!prev)}> 
+                                <button  className=''>
+                                description
+                                </button>
+                                </div>
+                                <div className={`${description? "visible":"hidden " }`}>
+                                    commnents Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni incidunt illum iste ab reprehenderit! Autem, pariatur blanditiis adipisci cumque laboriosam deserunt provident, minus neque quis, rem dolore iste? Debitis, deserunt!
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis possimus alias dolor eos quis tempore animi suscipit? Incidunt sapiente laborum facilis nisi. Dignissimos, inventore modi necessitatibus soluta quibusdam culpa obcaecati!
+                            
+                                </div>    
+                            </div>
+                            <div className='h-full p-3 bg-green-400 rounded-lg '>
                                 commnents Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni incidunt illum iste ab reprehenderit! Autem, pariatur blanditiis adipisci cumque laboriosam deserunt provident, minus neque quis, rem dolore iste? Debitis, deserunt!
                                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis possimus alias dolor eos quis tempore animi suscipit? Incidunt sapiente laborum facilis nisi. Dignissimos, inventore modi necessitatibus soluta quibusdam culpa obcaecati!
                             </div>

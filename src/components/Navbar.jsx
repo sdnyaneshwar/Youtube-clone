@@ -15,7 +15,7 @@ const Navbar = () => {
   const userData = useSelector((state) => state.auth.userData)
   const userstatus = useSelector((state) => state.auth.status)
   
-  console.log(userData);
+  // console.log(userData);
   const navigate = useNavigate()
   const [profile, setprofile] = useState(false)
   const dispatch = useDispatch()

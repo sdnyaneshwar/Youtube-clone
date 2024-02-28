@@ -21,7 +21,7 @@ const UploadAvatar = () => {
             console.log(response.data);
             let userData = response.data.data;
             dispatch(login(userData))
-            navigator('/profile')
+            navigator(`/profile/${userData.username}`)
 
         }).catch((error) => {
             console.log(error.message);

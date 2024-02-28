@@ -11,6 +11,7 @@ import Navbar from './components/Navbar'
 import UploadVideo from './pages/UploadVideo'
 import UserProfile from './pages/UserProfile'
 import PlayVideo from './pages/PlayVideo'
+import UpdateUserDetails from './pages/UpdateUserDetails'
 
 
 
@@ -28,9 +29,10 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/Home' element={<Navbar/>}/>
         <Route path='/upload-video' element={<UploadVideo/>}/>
-        <Route path='/profile' element={<UserProfile/>}/>
+        <Route path='/profile/:username' element={<UserProfile/>}/>
         <Route path='/uploadAvatar' element={<UploadAvatar/>}/>
         <Route path='/playvideo/:videoId' element={<PlayVideo/>}/>
+        <Route path='/updateuserdetails' element={<UpdateUserDetails/>}/>
 
       </Routes>
 
