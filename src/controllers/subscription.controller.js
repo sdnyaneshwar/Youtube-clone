@@ -1,25 +1,50 @@
 import mongoose from "mongoose";
-import { User } from "../models/user.model";
-import { Subscription } from "../models/subcription.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponce";
-import { asyncHandler } from "../utils/asyncHandler";
+import { User } from "../models/user.model.js";
+import { Subscription } from "../models/subcription.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponce.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 const toggleSubscription = asyncHandler(async (req, res) => {
-    const { channel_id } = req.params;
-    if (!channel_id) {
+    const { channelId } = req.params;
+    console.log(channelId);
+    if (!channelId) {
         throw new ApiError(400, "channel id is not provided")
 
     }
+    
+    const checkModel = await Subscription.findOneAndDelete([
+        {
+            $match:{
+                subscriber: new mongoose.Types.ObjectId(req.user._id),  
+                channel: new mongoose.Types.ObjectId(channelId)    
+            }
+        },
+        
+    ])
+
+    if(checkModel){
+        return res.status(200)
+        .json(
+            new ApiResponse(
+                200,
+                checkModel,
+                "channel is Unsubscribed"     
+
+            )
+        )
+    }
+
+    console.log(req.user._id);
     const model = await Subscription.create({
-        subscriber: req.user._id,    // user
-        channel: channel_id          // channel
+        subscriber: new mongoose.Types.ObjectId(req.user._id),    // user
+        channel: new mongoose.Types.ObjectId(channelId)          // channel
     })
 
-    if (!model?.length) {
-        throw new ApiError(404, "model does not created")
-    }
+    // if (!model?.length) {
+    //     throw new ApiError(404, "model does not created")
+    // }
 
     return res.status(200)
         .json(
@@ -31,14 +56,17 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         )
 })
 
-const getUserChannelSubscribers = asyncHandler(async (req, res) => {  // channel list who subscribed me
+const  getSubscribedChannels= asyncHandler(async (req, res) => {  // channel list who subscribed me
 
-
+    const {channelId} = req.params
+    if(!channelId){
+        throw new ApiError(400,"Do not get channelId")
+    }
 
     const subscriberList = await Subscription.aggregate([
         {
             $match: {
-                channel: req.user_id
+                channel: new mongoose.Types.ObjectId(channelId)
             },
 
         },
@@ -51,9 +79,9 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {  // channel
                 pipeline: [
                     {
                         $project: {
-                            fullName,
-                            username,
-                            avatar
+                            fullName:1,
+                            username:1,
+                            avatar:1
                         }
                     }
                 ]
@@ -78,11 +106,14 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {  // channel
 })
 
 
-const getSubscribedChannels = asyncHandler(async (req, res) => {  //me as user which channel i subcribed
-
+const getUserChannelSubscribers = asyncHandler(async (req, res) => {  //me as user which channel i subcribed
+    const {subscriberId} = req.params;
+    if(!subscriberId){
+        throw new ApiError(400,"subscriberId is not get")
+    }
     const channelList = await Subscription.aggregate([{
         $match: {
-            subscriber: req.user._id
+            subscriber: new mongoose.Types.ObjectId(subscriberId)
         }
     }, {
         $lookup:{
@@ -93,9 +124,9 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {  //me as user w
             pipeline:[
                 {
                     $project:{
-                            fullName,
-                            username,
-                            avatar
+                            fullName:1,
+                            username:1,
+                            avatar:1
                     }
                 }
             ]
