@@ -19,10 +19,6 @@ const AllVideos = () => {
 
             ))
             }
-            
-
-
-
         </div>
 
     )

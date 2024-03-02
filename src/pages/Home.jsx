@@ -70,7 +70,7 @@ const Home = () => {
 
 
                 </div>
-                <div className='flex w-[100%] h-[85%] flex-1'>
+                <div className='flex w-[100%] h-[85%] flex-1 bg-white'>
 
                     <div className={ `sticky top-[15%] bottom-0 flex flex-col items-center justify-start w-[30%] h-screen gap-5 pt-6 font-semibold transition-all duration-300 ease-in-out delay-700 bg-slate-50 ${
                         menuIcon? "visible":"hidden"

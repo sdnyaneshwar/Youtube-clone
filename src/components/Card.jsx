@@ -4,7 +4,7 @@ const Card = (props) => {
 
 
     return (
-        <div className=' w-[250px] h-[250px] hover:border p-[10px] flex flex-col justify-center items-center rounded-xl m-3 hover:shadow-md ' >
+        <div className=' w-[250px] h-[250px] hover:border p-[10px] bg-zinc-100 flex flex-col justify-center items-center rounded-xl m-3  hover:shadow-indigo-700 hover:shadow-md ' >
             <Link to={`/playvideo/${props.video._id}`}>
                 <div>
                     <img src={props.video.thumbnail} alt="coverImage" className='w-[220px] h-[130px] rounded-2xl' />
@@ -18,7 +18,7 @@ const Card = (props) => {
                             {props.video.title}
                         </div>
                     </div>
-                    <span>channel Nama</span>
+                    <span>channel Name</span>
                     <div>
                         <span>view</span>
                         <span>{props.video.createsAt}</span>

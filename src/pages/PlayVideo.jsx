@@ -4,6 +4,11 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { login } from '../store/authSlice'
 import SidebarVideos from '../components/SidebarVideos'
+import { AiOutlineLike } from "react-icons/ai";
+import { AiFillLike } from "react-icons/ai";
+import CommentForm from '../components/CommentForm'
+import CommentBox from '../components/CommentBox'
+
 
 const PlayVideo = () => {
     const param = useParams()
@@ -11,20 +16,34 @@ const PlayVideo = () => {
     const [video, setVideo] = useState({})
     const [key, setkey] = useState(0)
     const [owner, setOwner] = useState({})
-    const [description , setDescription] = useState(false)
+    const [description, setDescription] = useState(false)
+    const [like, setLike] = useState();
 
-
-
-    const subscribeHandle = () =>{
-        if(owner){
-            axios.post(`http://localhost:8000/api/v1/users/c/${owner}`,null,
-            {
-                withCredentials:true
-            }).then((response)=>{
-                console.log(response.data);
-            }).catch((error)=>{
+    const likeHandle = () => {
+        if (_id) {
+            axios.get(`http://localhost:8000/api/v1/like/c/${_id}`, {
+                withCredentials: true
+            }).then((response) => {
+                setLike(prev => !prev)
+            }).catch((error) => {
                 console.log(error.message);
             })
+        }
+    }
+
+    const subscribeHandle = () => {
+        console.log(owner._id);
+        const channelId = owner._id;
+        if (owner) {
+            axios.post(`http://localhost:8000/api/v1/subscribe/c/${channelId}`, null,
+                {
+                    withCredentials: true
+                }).then((response) => {
+                    console.log(response.data);
+                    getUserProfile()
+                }).catch((error) => {
+                    console.log(error.message);
+                })
         }
     }
 
@@ -32,7 +51,6 @@ const PlayVideo = () => {
     const getUserProfile = () => {
         if (video.owner) {
             const ownerId = video.owner;
-            const username= undefined;
             console.log(ownerId);
             axios.get(`http://localhost:8000/api/v1/users/c/${ownerId}`, {
                 withCredentials: true
@@ -46,15 +64,16 @@ const PlayVideo = () => {
                     console.log(error.message);
                 });
         }
+        setLike(video.isLiked)
     };
 
     useEffect(() => {
         axios.get(`http://localhost:8000/api/v1/videos/${_id}`, {
             withCredentials: true
         }).then((responce) => {
-            console.log(responce.data.data);
+            console.log(responce.data.data[0]);
 
-            setVideo(responce.data.data);
+            setVideo(responce.data.data[0]);
             setkey(prev => prev + 1)
 
 
@@ -74,7 +93,7 @@ const PlayVideo = () => {
 
 
     return (
-        <div key={key} className='w-full h-screen overflow-hidden'>
+        <div key={key} className='w-full h-full overflow-hidden'>
             <div className='sticky top-0 z-50 h-[15%]'>
                 <Navbar />
             </div>
@@ -93,7 +112,7 @@ const PlayVideo = () => {
                                     Your browser does not support the video tag.
                                 </video> */}
                             </div>
-                            <div className='p-3 bg-yellow-300 rounded-lg mt'>
+                            <div className='p-3 bg-indigo-100 rounded-lg mt'>
                                 <div className='w-[100%] flex gap-4 items-center'>
                                     <div>
                                         <img className="w-10 h-10 rounded-full" src={owner.avatar} alt="Rounded avatar"></img>
@@ -107,8 +126,15 @@ const PlayVideo = () => {
                                     <div>
                                         <nav>viwes {video.views}</nav>
                                     </div>
-                                    <div className='p-2 text-white rounded-full bg-indigo-950' onClick={()=>subscribeHandle}>
-                                        Subscriber  {owner.subscriberCounts}
+                                    <div className='flex items-center gap-4'>
+                                        <div onClick={likeHandle}>
+                                            <AiOutlineLike className={`text-xl  ${like ? "hidden" : "visible"}`} />
+                                            <AiFillLike className={`text-xl ${like ? "visible" : "hidden"}`} />
+                                            <nav>{video.videoLikedCount}</nav>
+                                        </div>
+                                        <div className={`p-2 text-white rounded-full cursor-pointer ${owner.isSubscribed ? "bg-indigo-950" : "bg-indigo-500"}`} onClick={subscribeHandle}>
+                                            Subscriber  {owner.subscriberCounts}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className='w-[100%] flex gap-4 items-center'>
@@ -120,23 +146,27 @@ const PlayVideo = () => {
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div className='p-3 bg-yellow-300 rounded-lg mt'>
-                                <div className={`${description? "bg-slate-400 p-3":"p-3 bg-slate-400  w-fit"}`} onClick={()=>setDescription(prev=>!prev)}> 
-                                <button  className=''>
-                                description
-                                </button>
+
+                            <div className='p-3 bg-indigo-100 rounded-lg mt'>
+                                <div className={`${description ? "bg-slate-400 p-3" : "p-3 bg-slate-400  w-fit"}`} onClick={() => setDescription(prev => !prev)}>
+                                    <button className=''>
+                                        description
+                                    </button>
                                 </div>
-                                <div className={`${description? "visible":"hidden " }`}>
+                                <div className={`${description ? "visible" : "hidden "}`}>
                                     commnents Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni incidunt illum iste ab reprehenderit! Autem, pariatur blanditiis adipisci cumque laboriosam deserunt provident, minus neque quis, rem dolore iste? Debitis, deserunt!
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis possimus alias dolor eos quis tempore animi suscipit? Incidunt sapiente laborum facilis nisi. Dignissimos, inventore modi necessitatibus soluta quibusdam culpa obcaecati!
-                            
-                                </div>    
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis possimus alias dolor eos quis tempore animi suscipit? Incidunt sapiente laborum facilis nisi. Dignissimos, inventore modi necessitatibus soluta quibusdam culpa obcaecati!
+
+                                </div>
                             </div>
-                            <div className='h-full p-3 bg-green-400 rounded-lg '>
-                                commnents Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni incidunt illum iste ab reprehenderit! Autem, pariatur blanditiis adipisci cumque laboriosam deserunt provident, minus neque quis, rem dolore iste? Debitis, deserunt!
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis possimus alias dolor eos quis tempore animi suscipit? Incidunt sapiente laborum facilis nisi. Dignissimos, inventore modi necessitatibus soluta quibusdam culpa obcaecati!
-                            </div>
+                            { video && <div className='w-full bg-white rounded-lg '>
+                                <div>
+                                <CommentForm video={video._id}/>
+                                </div>
+                                <div>
+                                    <CommentBox video={video._id}/>
+                                </div>
+                            </div>}
 
 
                         </div>
@@ -144,7 +174,7 @@ const PlayVideo = () => {
 
                     </div>
                 </div>
-                <div className='w-[25%] h-screen scroll-smooth bg-indigo-500 flex justify-center overflow-y-auto'>
+                <div className='w-[25%] h-screen scroll-smooth bg-white flex justify-center overflow-y-auto'>
 
                     <SidebarVideos />
                 </div>

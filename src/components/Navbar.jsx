@@ -36,7 +36,7 @@ const Navbar = () => {
   }
   return (
     <div className=''>
-      <div className='h-[15%] w-full bg-zinc-50 flex  justify-around shadow-xl border gap-6  py-4'>
+      <div className='h-[15%] w-full bg-zinc-100 flex  justify-around shadow-xl border gap-6  py-4'>
         {
           menuIcon ? '' : (
             <div className={`p-2  rotate-90 shadow-md cursor-pointer hover:shadow-lg hover:text-indigo-500 bg-slate-100 visible ${menuIcon}`} onClick={() => dispatch(setMenuhandle())}>
@@ -53,8 +53,8 @@ const Navbar = () => {
           CHITRATUBE
         </div>
        </Link>
-        <div className='p-2 border border-blue-400 rounded-full hover:shadow-lg'>
-          <input type="text" className='' />
+        <div className='p-2 bg-white border border-blue-400 rounded-full hover:shadow-lg'>
+          <input type="text" className='bg-white' />
           <span className='font-semibold text-green-500 cursor-pointer hover:text-indigo-500'>search</span>
 
         </div>
