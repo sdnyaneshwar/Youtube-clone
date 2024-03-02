@@ -6,55 +6,100 @@ import { ApiResponse } from "../utils/ApiResponce.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 
+// const toggleSubscription = asyncHandler(async (req, res) => {
+
+//     const { channelId } = req.params;
+//     console.log(channelId);
+//     if (!channelId) {
+//         throw new ApiError(400, "channel id is not provided")
+
+//     }
+    
+//     const checkModel = await Subscription.findOneAndDelete([
+//         {
+//             $match:{
+//                 subscriber: req.user._id,  
+//                 channel: channelId    
+//             }
+//         },
+        
+//     ])
+
+//     if(checkModel){
+//         return res.status(200)
+//         .json(
+//             new ApiResponse(
+//                 200,
+//                 checkModel,
+//                 "channel is Unsubscribed"     
+
+//             )
+//         )
+//     }
+
+//     console.log(req.user._id);
+//     const model = await Subscription.create({
+//         subscriber: req.user._id,    // user
+//         channel: channelId          // channel
+//     })
+
+//     // if (!model?.length) {
+//     //     throw new ApiError(404, "model does not created")
+//     // }
+
+//     return res.status(200)
+//         .json(
+//             new ApiResponse(
+//                 200,
+//                 model,
+//                 "user is subcribed"
+//             )
+//         )
+// })
+
+
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
-    console.log(channelId);
+
     if (!channelId) {
-        throw new ApiError(400, "channel id is not provided")
-
+        throw new ApiError(400, "Channel ID is not provided");
     }
-    
-    const checkModel = await Subscription.findOneAndDelete([
-        {
-            $match:{
-                subscriber: new mongoose.Types.ObjectId(req.user._id),  
-                channel: new mongoose.Types.ObjectId(channelId)    
-            }
-        },
+
+    // Check if the user is already subscribed to the channel
+    const existingSubscription = await Subscription.findOne({
+        subscriber: req.user._id,
+        channel: channelId
+    });
+
+    if (existingSubscription) {
+        // If the subscription exists, delete it (unsubscribe)
+        await Subscription.findOneAndDelete({
+            subscriber: req.user._id,
+            channel: channelId
+        });
         
-    ])
 
-    if(checkModel){
-        return res.status(200)
-        .json(
-            new ApiResponse(
-                200,
-                checkModel,
-                "channel is Unsubscribed"     
-
-            )
-        )
+        return res.status(200).json(new ApiResponse(
+            200,
+            existingSubscription,
+            "Channel is unsubscribed"
+        ));
     }
 
-    console.log(req.user._id);
-    const model = await Subscription.create({
-        subscriber: new mongoose.Types.ObjectId(req.user._id),    // user
-        channel: new mongoose.Types.ObjectId(channelId)          // channel
-    })
+    // If the subscription does not exist, create a new subscription (subscribe)
+    const newSubscription = await Subscription.create({
+        subscriber: req.user._id,
+        channel: channelId
+    });
 
-    // if (!model?.length) {
-    //     throw new ApiError(404, "model does not created")
-    // }
+    return res.status(200).json(new ApiResponse(
+        200,
+        newSubscription,
+        "User is subscribed"
+    ));
+});
 
-    return res.status(200)
-        .json(
-            new ApiResponse(
-                200,
-                model,
-                "user is subcribed"
-            )
-        )
-})
+
 
 const  getSubscribedChannels= asyncHandler(async (req, res) => {  // channel list who subscribed me
 

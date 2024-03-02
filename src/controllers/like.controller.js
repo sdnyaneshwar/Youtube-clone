@@ -3,12 +3,12 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponce.js";
 import { Video } from "../models/video.model.js";
 import {Like} from '../models/like.model.js'
-import asyncHandler from '../utils/asyncHandler.js'
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const toggleVideoLike = asyncHandler(async(req,res)=>{
     const {videoId} = req.params
 
-    if(!(videoId || videoId != '')){
+    if(!(videoId)){
         throw new ApiError(
             400,
             "Video id is required"

@@ -54,11 +54,18 @@ app.use(cookieParser())
 import userRouter from './routes/user.routes.js'
 import videoRouter from '../src/routes/video.routes.js'
 import subscriberRouter from '../src/routes/subscription.routes.js'
+import likeRouter from '../src/routes/likes.roues.js'
+import commentRouter from '../src/routes/comment.routes.js'
+
+
 
 //routes declaration
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/videos",videoRouter)
 app.use("/api/v1/subscribe" , subscriberRouter)
+app.use("/api/v1/like",likeRouter)
+app.use("/api/v1/comment",commentRouter )
+
 // http://localhost:8000/api/v1/users/register
 
 export { app }

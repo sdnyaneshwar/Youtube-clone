@@ -94,7 +94,39 @@ const getVideoById = asyncHandler(async(req,res)=>{
         )
     }
 
-    const video = await Video.findById(videoId)
+    const video = await Video.aggregate([
+        {
+            $match:{
+                _id: new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup:{
+                from:"likes",
+                localField:"_id",
+                foreignField:"video",
+                as:"videoLikedList",
+        
+            }
+        },
+        {
+            $addFields:{
+                videoLikedCount:{
+                    $size:"$videoLikedList"
+                },
+                isLiked:{
+                    $cond:{
+                        if: {$in:[req.user._id,"$videoLikedList.likedBy"]},
+                        then:true,
+                        else:false
+                    }
+                }
+            }
+        },
+        {
+            $limit: 1 // Limit the result to only one document
+        }
+    ])
 
     return res 
     .status(200)

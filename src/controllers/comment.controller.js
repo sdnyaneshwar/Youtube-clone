@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponce";
-import { asyncHandler } from "../utils/asyncHandler";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponce.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { Video } from "../models/video.model.js";
 import { Comment } from "../models/comment.model.js";
 
@@ -16,35 +16,52 @@ const getVideoComments =asyncHandler(async(req,res)=>{
     )
   }
 
-    const comment = await Video.aggregate([
-    {
-        $match:{
-            _id:videoId
-        }
-        
-    },{
-        $lookup:{
-            from:"comments",
-            localField:"_id",
-            foreignField:"video",
-            as:"comments"
-            
-        }
-    },
-    {
-        $addFields:{
-            commentCount:{
-                $size:"$comments"
+    const data = await Comment.aggregate([
+        {
+            $match:{
+                video:new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup:{
+                from:"users",
+                localField:"owner",
+                foreignField:"_id",
+                as:"commentuser",
+                pipeline:[
+                    {
+                        $project:{
+                            fullName:1,
+                            avatar:1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields:{
+                isUpdated:{
+                $cond:{
+                    if:{$in:[req.user?._id,"$commentuser._id"]},
+                    then:true,
+                    else:false
+
+
+                }
+            }
             }
         }
-    }
-  ])
+
+
+    ]
+    )
+
 
   return res.status(200)
   .json(
     new ApiResponse(
         200,
-        comment,
+        data,
         "Comment get successfully"
 
     )
@@ -54,15 +71,15 @@ const getVideoComments =asyncHandler(async(req,res)=>{
 const addComment = asyncHandler(async(req,res)=>{
     const {content} =req.body
     const {videoId}=req.params
-
-    if(!(content && (videoId || (videoId != '')) )){
+    console.log("content  ",content,"videoId  ",videoId);
+    if(!(content && videoId) ){
         throw new ApiError(
             400,"VideoId and content required"
 
         )
     }
 
-    const addedComment = await Comment.create({
+    const comment = await Comment.create({
         content:content,
         video:videoId,
         owner:req.user._id
@@ -74,7 +91,7 @@ const addComment = asyncHandler(async(req,res)=>{
     .json(
         new ApiResponse(
             200,
-            addComment,
+            comment,
             'comment added successfully'
         )
     )    
@@ -82,22 +99,21 @@ const addComment = asyncHandler(async(req,res)=>{
 
 const updateComment = asyncHandler(async(req,res)=>{
     const {content} =req.body
-    const {videoId}=req.params
+    const {commentId}=req.params
+    console.log(commentId,content);
 
-    const updatedComment = await Comment.aggregate([
-        {
-            $match:{
-                owner:req.user._id,
-                video:videoId
-            }
+    const updatedComment = await Comment.findOneAndUpdate(
+        { 
+          _id: new mongoose.Types.ObjectId(commentId),  
+          owner: req.user._id
+         },
+        { 
+          content: content 
         },
-        {
-            $set:{
-                content:content,
-
-            }
+        { 
+          new: true 
         }
-    ])        
+      );  
 
     return res.status(200)
         .json(
@@ -111,6 +127,38 @@ const updateComment = asyncHandler(async(req,res)=>{
 })
 
 const deleteComment = asyncHandler(async(req,res)=>{
+    const {commentId} = req.params;
+
+    if(!commentId){
+        throw new ApiError(
+            400,
+            "commmentId is required"
+        )
+    }
+
+    const commentdlt = await Comment.findOne({
+        _id:new mongoose.Types.ObjectId(commentId),
+        owner:req.user._id
+    })
+
+    if(!commentdlt){
+        throw new ApiError(400,"user is unautherized")
+
+    }
+
+    const deletedcommment = await Comment.findByIdAndDelete({
+        _id:commentId
+    })
+
+
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,
+            deletedcommment,
+            "Comment is deleted "
+            )
+    )
 
 })
 
