@@ -12,6 +12,7 @@ import UploadVideo from './pages/UploadVideo'
 import UserProfile from './pages/UserProfile'
 import PlayVideo from './pages/PlayVideo'
 import UpdateUserDetails from './pages/UpdateUserDetails'
+import SearchVideos from './pages/SearchVideos'
 
 
 
@@ -33,7 +34,8 @@ function App() {
         <Route path='/uploadAvatar' element={<UploadAvatar/>}/>
         <Route path='/playvideo/:videoId' element={<PlayVideo/>}/>
         <Route path='/updateuserdetails' element={<UpdateUserDetails/>}/>
-
+        
+        <Route path='/video/:search' element={<SearchVideos/>}/>
       </Routes>
 
 

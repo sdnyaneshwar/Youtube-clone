@@ -39,6 +39,8 @@ const Home = () => {
         axios.get('http://localhost:8000/api/v1/videos',{
             withCredentials: true
           }).then((responce)=>{
+            console.log(responce);
+            
                 dispatch(addVideos(responce.data.data))
                 // getVideo.map((video)=>{
                 //     console.log(video);

@@ -21,6 +21,7 @@ const Navbar = () => {
   const dispatch = useDispatch()
   const menuIcon = useSelector((state) => state.nav.menuState)
 
+  const [search, setSearch] = useState()
 
   const logoutHandle = () => {
     axios.post('http://localhost:8000/api/v1/users/logout', null, {
@@ -34,6 +35,12 @@ const Navbar = () => {
       console.log(error.message);
     })
   }
+  
+  const searchHandle =(e)=>{
+    e.preventDefault();
+    navigate(`/video/${search}`);
+  }
+
   return (
     <div className=''>
       <div className='h-[15%] w-full bg-zinc-100 flex  justify-around shadow-xl border gap-6  py-4'>
@@ -54,8 +61,12 @@ const Navbar = () => {
         </div>
        </Link>
         <div className='p-2 bg-white border border-blue-400 rounded-full hover:shadow-lg'>
-          <input type="text" className='bg-white' />
-          <span className='font-semibold text-green-500 cursor-pointer hover:text-indigo-500'>search</span>
+          
+          
+          <form onSubmit={searchHandle}>
+            <input type="text" onChange={(e)=>setSearch(e.target.value)}/>
+            <input type="submit" />
+          </form>
 
         </div>
 

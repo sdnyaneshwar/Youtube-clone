@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { login } from '../store/authSlice'
 import SidebarVideos from '../components/SidebarVideos'
@@ -113,14 +113,17 @@ const PlayVideo = () => {
                                 </video> */}
                             </div>
                             <div className='p-3 bg-indigo-100 rounded-lg mt'>
-                                <div className='w-[100%] flex gap-4 items-center'>
-                                    <div>
-                                        <img className="w-10 h-10 rounded-full" src={owner.avatar} alt="Rounded avatar"></img>
-                                    </div>
-                                    <div className='items-center text-center '>
+                                <div className='w-[100%]  items-center'>
+                                    <div className='px-8 py-3'>
                                         <h1 className='items-center font-bold'>{video.title}</h1>
 
                                     </div>
+                                    <Link to={`/profile/${owner.username}`} >
+                                    <div className='flex gap-2'>
+                                        <img className="w-10 h-10 rounded-full" src={owner.avatar} alt="Rounded avatar"></img>
+                                        <div>{owner.username}</div>
+                                    </div>
+                                    </Link>
                                 </div>
                                 <div className='w-[100%] flex gap-4 items-center justify-between'>
                                     <div>
