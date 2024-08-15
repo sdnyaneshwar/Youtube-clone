@@ -36,7 +36,8 @@ const Home = () => {
     }
 
     const getAllVideo = ()=>{
-        axios.get('http://localhost:8000/api/v1/videos',{
+        axios.post('http://localhost:8000/api/v1/videos/gelAllVideos',{isVideo:true}
+            ,{
             withCredentials: true
           }).then((responce)=>{
             console.log(responce);

@@ -14,8 +14,7 @@ import {upload} from "../middlewares/multer.middleware.js"
 
 const router =Router()
 router.use(verifyJWT)
-router.route('/').get(getAllVideos)
-        .post(
+router.route('/').post(
             upload.fields([
                 {
                     name:"videoFile",
@@ -47,5 +46,5 @@ router.route('/:videoId')
 router.route('/toggle/publish/:videoId').patch(togglePublishStatus)
 router.route('/video/search/:searchText').post(getVideoSearch);
 router.route('/user/:Id').get(getUserAllVideos)
-
+router.route('/gelAllVideos').post(getAllVideos)
 export default router

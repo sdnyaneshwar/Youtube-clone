@@ -87,6 +87,10 @@ const videoSchema = new Schema(
             type:String,
             required:true
 
+        },
+        isVideo:{
+            type:Boolean,
+            default:true
         }
 
     }, 

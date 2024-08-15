@@ -13,6 +13,7 @@ import UserProfile from './pages/UserProfile'
 import PlayVideo from './pages/PlayVideo'
 import UpdateUserDetails from './pages/UpdateUserDetails'
 import SearchVideos from './pages/SearchVideos'
+import Reels from './pages/Reels'
 
 
 
@@ -36,6 +37,7 @@ function App() {
         <Route path='/updateuserdetails' element={<UpdateUserDetails/>}/>
         
         <Route path='/video/:search' element={<SearchVideos/>}/>
+        <Route path='/reels' element={<Reels/>}/>
       </Routes>
 
 

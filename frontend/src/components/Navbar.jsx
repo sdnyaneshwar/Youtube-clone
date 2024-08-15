@@ -76,7 +76,9 @@ const Navbar = () => {
             <div>
               hii {userData.fullName}
             </div>
-
+            <Link to={"/reels"}>
+              link
+            </Link>
             <div className='px-4 py-2' onClick={logoutHandle}>
               <IoIosLogOut className='text-[30px] text-indigo-600  cursor-pointer font-semibold' />
 
