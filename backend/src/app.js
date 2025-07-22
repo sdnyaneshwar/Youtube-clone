@@ -8,7 +8,7 @@ const app = express();
 const allowedOrigin = 'http://localhost:3000'; // Update this with your frontend URL
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.CORS_ORIGIN || 3000,
     credentials: true, // Allow credentials (cookies)
 }));
 

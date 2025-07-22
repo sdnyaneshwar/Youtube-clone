@@ -1,33 +1,31 @@
-import React from 'react'
+import React from 'react';
 import { Link } from 'react-router-dom';
-const Card = (props) => {
 
+const Card = (props) => {
+    const { thumbnail, title, views, createdAt, _id } = props.video;
 
     return (
-        <div className=' w-[250px] h-[250px] hover:border p-[10px] bg-zinc-100 flex flex-col justify-center items-center rounded-xl m-3  hover:shadow-indigo-700 hover:shadow-md ' >
-            <Link to={`/playvideo/${props.video._id}`}>
-                <div>
-                    <img src={props.video.thumbnail} alt="coverImage" className='w-[220px] h-[130px] rounded-2xl' />
+        <div className="w-[260px] h-auto bg-zinc-100 shadow-md border-b rounded-2xl  hover:shadow-lg hover:border-indigo-400 transition-all duration-300 m-3">
+            <Link to={`/playvideo/${_id}`} className="block p-3">
+                <div className="mb-3">
+                    <img
+                        src={thumbnail}
+                        alt="coverImage"
+                        className="w-full h-[140px] object-cover rounded-xl"
+                    />
                 </div>
-                <div className='w-[200px]'>
-                    <div>
-                        <div>
-                            avatar
-                        </div>
-                        <div>
-                            {props.video.title}
-                        </div>
-                    </div>
-                    <span>channel Name</span>
-                    <div>
-                        <span>view</span>
-                        <span>{props.video.createsAt}</span>
+                <div className="flex flex-col gap-1 text-sm text-gray-800">
+                    {/* <div className="text-xs text-gray-500 font-medium">User</div> */}
+                    <div className="text-base font-semibold line-clamp-2">{title}</div>
+                    {/* <div className="text-xs text-gray-500 mt-1">Channel Name</div> */}
+                    <div className="flex justify-between items-center text-xs text-gray-400 mt-2">
+                        <span>{views} views</span>
+                        <span>{new Date(createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
-
             </Link>
         </div>
-    )
-}
+    );
+};
 
-export default Card
+export default Card;

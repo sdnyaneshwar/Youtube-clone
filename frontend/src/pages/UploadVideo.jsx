@@ -1,101 +1,121 @@
-
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { useSelector } from 'react-redux';
-import { ImSpinner } from "react-icons/im";
-
+import { ImSpinner8 } from "react-icons/im";
 
 const UploadVideo = () => {
-  const signUpImage = 'src/Photos/signup.jpg'
-  const [isVideo , setIsVideo] = useState(true);
-
-  const [videoFile, setVideo] = useState(null)
-  const [thumbnail, setthumbnail] = useState(null)
-  const [title, settitle] = useState('')
-  const [description, setDescription] = useState('')
-  const user = useSelector((state) => state.auth.userData)
-  const [loading, setLoading] = useState(false)
-
-
+  const [isVideo, setIsVideo] = useState(true);
+  const [videoFile, setVideo] = useState(null);
+  const [thumbnail, setThumbnail] = useState(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const user = useSelector((state) => state.auth.userData);
+  const [loading, setLoading] = useState(false);
 
   const videoHandle = () => {
     const formdata = new FormData();
-    formdata.append("title", title)
-    formdata.append("description", description)
-    formdata.append("videoFile", videoFile)
-    formdata.append("thumbnail", thumbnail)
-    formdata.append("isVideo",isVideo)
+    formdata.append("title", title);
+    formdata.append("description", description);
+    formdata.append("videoFile", videoFile);
+    formdata.append("thumbnail", thumbnail);
+    formdata.append("isVideo", isVideo);
 
-    console.log(formdata);
-    setLoading(true)
+    setLoading(true);
     axios.post('http://localhost:8000/api/v1/videos', formdata, {
-      withCredentials: true
-    }).then((responce) => {
-      console.log(responce.data);
-      setLoading(false)
-      console.log("video uploaded successfully");
-    }).catch((error) => {
-      setLoading(false)
-      console.log(error.message);
+      withCredentials: true,
     })
-  }
+      .then((response) => {
+        console.log(response.data);
+        setLoading(false);
+        alert("Video uploaded successfully!");
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error(error.message);
+      });
+  };
+
   return (
-    <div className='w-full h-screen'  >
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-100 py-10 px-4 flex justify-center items-start">
+      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl p-8 space-y-6">
+        <h2 className="text-3xl font-semibold text-indigo-700 text-center">Upload Video</h2>
 
+        <div className="space-y-2">
+          <label className="text-gray-700 font-medium">Title</label>
+          <input
+            type="text"
+            placeholder="Enter video title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-xl outline-indigo-500"
+          />
+        </div>
 
-      <div className=''>
-        <div className='flex flex-col items-center pt-5 bg-white shadow-sm rounded-2xl hover:shadow-slate-50 gap-7'>
-          {
-            loading ? <div>
-              <ImSpinner />
-            </div>
-              :
+        <div className="space-y-2">
+          <label className="text-gray-700 font-medium">Description</label>
+          <textarea
+            placeholder="Enter description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            className="w-full p-3 border border-gray-300 rounded-xl outline-indigo-500 resize-none"
+          ></textarea>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-gray-700 font-medium">Upload Video</label>
+          <input
+            type="file"
+            onChange={(e) => setVideo(e.target.files[0])}
+            className="w-full border border-gray-300 p-2 rounded-xl cursor-pointer"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-gray-700 font-medium">Upload Thumbnail</label>
+          <input
+            type="file"
+            onChange={(e) => setThumbnail(e.target.files[0])}
+            className="w-full border border-gray-300 p-2 rounded-xl cursor-pointer"
+          />
+        </div>
+
+        <div className="flex items-center space-x-3">
+          <input
+            id="reelCheck"
+            type="checkbox"
+            checked={isVideo}
+            onChange={() => setIsVideo((prev) => !prev)}
+            className="w-4 h-4 accent-indigo-600"
+          />
+          <label htmlFor="reelCheck" className="text-gray-700">
+            Is this a Reel? <span className="font-semibold">{isVideo ? "Yes" : "No"}</span>
+          </label>
+        </div>
+
+        <div className="flex justify-center">
+          <button
+            onClick={videoHandle}
+            disabled={loading}
+            className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-2xl hover:bg-indigo-500 active:scale-95 transition disabled:opacity-50"
+          >
+            {loading ? (
               <>
-                <div>
-
-                  <div>Title</div>
-                  <input type="text" className='w-[340px] m-1 border-2 shadow-lg outline-none rounded-xl ' value={title} onChange={(e) => settitle(e.target.value)} />
-                </div>
-                <div>
-                  <div>Discription</div>
-                  <input type="text" className='m-1 w-[340px] h-[100px] border-2 shadow-lg outline-none rounded-xl pt-0 overflow-y-auto' value={description} onChange={(e) => setDescription(e.target.value)} />
-                </div>
-
-                <span className=''>
-                  <div>Videofile</div>
-                  <input type="file" name='videoFile' className='border-2' onChange={(e) => setVideo(e.target.files[0])} />
-
-
-                </span >
-                <span className=''>
-                  <div>Thumnail</div>
-                  <input type="file" name='thumbnail' className='border-2' onChange={(e) => setthumbnail(e.target.files[0])} />
-
-
-                </span >
-                <div class="flex items-center mb-4">
-                  <input id="default-checkbox" type="checkbox" value={isVideo} onClick={()=>setIsVideo((prev)=>!prev)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                  <label for="default-checkbox" class="ms-2  text-black ">is a reel {
-                    isVideo? "true":"false"
-                    }</label>
-                </div>
-
-                <button className='p-2 px-3 text-white bg-indigo-600 hover:shadow5-2xl hover:bg-indigo-400 rounded-2xl' onClick={videoHandle}>
-                  <IoCloudUploadOutline className='w-12 h-8' />
-                </button>
-
-
-
+                <ImSpinner8 className="animate-spin" />
+                Uploading...
               </>
-          }
+            ) : (
+              <>
+                <IoCloudUploadOutline className="text-2xl" />
+                Upload Video
+              </>
+            )}
+          </button>
         </div>
       </div>
-
-
-
     </div>
-  )
-}
+  );
+};
 
-export default UploadVideo
+export default UploadVideo;

@@ -1,191 +1,130 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
-import { Link, useParams } from 'react-router-dom'
-import axios from 'axios'
-import { login } from '../store/authSlice'
-import SidebarVideos from '../components/SidebarVideos'
-import { AiOutlineLike } from "react-icons/ai";
-import { AiFillLike } from "react-icons/ai";
-import CommentForm from '../components/CommentForm'
-import CommentBox from '../components/CommentBox'
-
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import axios from 'axios';
+import Navbar from '../components/Navbar';
+import SidebarVideos from '../components/SidebarVideos';
+import CommentForm from '../components/CommentForm';
+import CommentBox from '../components/CommentBox';
+import { AiOutlineLike, AiFillLike } from 'react-icons/ai';
 
 const PlayVideo = () => {
-    const param = useParams()
-    let _id = param.videoId;
-    const [video, setVideo] = useState({})
-    const [key, setkey] = useState(0)
-    const [owner, setOwner] = useState({})
-    const [description, setDescription] = useState(false)
-    const [like, setLike] = useState();
+  const { videoId } = useParams();
+  const [video, setVideo] = useState({});
+  const [key, setKey] = useState(0);
+  const [owner, setOwner] = useState({});
+  const [descriptionVisible, setDescriptionVisible] = useState(false);
+  const [like, setLike] = useState(false);
 
-    const likeHandle = () => {
-        if (_id) {
-            axios.get(`http://localhost:8000/api/v1/like/c/${_id}`, {
-                withCredentials: true
-            }).then((response) => {
-                setLike(prev => !prev)
-            }).catch((error) => {
-                console.log(error.message);
-            })
-        }
+  const fetchVideo = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v1/videos/${videoId}`, { withCredentials: true });
+      const videoData = response.data.data[0];
+      setVideo(videoData);
+      setKey((prev) => prev + 1);
+    } catch (error) {
+      console.error(error.message);
     }
+  };
 
-    const subscribeHandle = () => {
-        console.log(owner._id);
-        const channelId = owner._id;
-        if (owner) {
-            axios.post(`http://localhost:8000/api/v1/subscribe/c/${channelId}`, null,
-                {
-                    withCredentials: true
-                }).then((response) => {
-                    console.log(response.data);
-                    getUserProfile()
-                }).catch((error) => {
-                    console.log(error.message);
-                })
-        }
+  const fetchOwner = async () => {
+    if (video.owner) {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/v1/users/c/${video.owner}`, { withCredentials: true });
+        setOwner(response.data.data);
+        setLike(video.isLiked);
+      } catch (error) {
+        console.error(error.message);
+      }
     }
+  };
 
+  const handleLike = async () => {
+    try {
+      await axios.get(`http://localhost:8000/api/v1/like/c/${videoId}`, { withCredentials: true });
+      setLike((prev) => !prev);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
-    const getUserProfile = () => {
-        if (video.owner) {
-            const ownerId = video.owner;
-            console.log(ownerId);
-            axios.get(`http://localhost:8000/api/v1/users/c/${ownerId}`, {
-                withCredentials: true
-            })
-                .then((response) => {
-                    const data = response.data.data;
-                    setOwner(data);
-                    console.log(data);
-                })
-                .catch((error) => {
-                    console.log(error.message);
-                });
-        }
-        setLike(video.isLiked)
-    };
+  const handleSubscribe = async () => {
+    try {
+      await axios.post(`http://localhost:8000/api/v1/subscribe/c/${owner._id}`, null, { withCredentials: true });
+      fetchOwner();
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
-    useEffect(() => {
-        axios.get(`http://localhost:8000/api/v1/videos/${_id}`, {
-            withCredentials: true
-        }).then((responce) => {
-            console.log(responce.data.data[0]);
+  useEffect(() => {
+    fetchVideo();
+  }, [videoId]);
 
-            setVideo(responce.data.data[0]);
-            setkey(prev => prev + 1)
+  useEffect(() => {
+    fetchOwner();
+  }, [video.owner]);
 
+  return (
+    <div key={key} className="w-full min-h-screen flex flex-col bg-gray-50">
+      <div className="sticky top-0 z-50 bg-white shadow-md">
+        <Navbar />
+      </div>
+      <div className="flex flex-col lg:flex-row w-full">
+        <div className="lg:w-3/4 w-full p-4 space-y-4 overflow-y-auto">
+          <div className="w-full">
+            {video.videoFile && (
+              <video className="w-full rounded-lg" controls>
+                <source src={video.videoFile} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
+          </div>
 
-        }).catch((error) => {
-            console.log(error.message);
-        })
-
-        getUserProfile()
-    }, [_id])
-
-
-    useEffect(() => {
-        if (video.owner) {
-            getUserProfile();
-        }
-    }, [video.owner])
-
-
-    return (
-        <div key={key} className='w-full h-full overflow-hidden'>
-            <div className='sticky top-0 z-50 h-[15%]'>
-                <Navbar />
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h1 className="text-xl font-bold mb-2">{video.title}</h1>
+            <div className="flex items-center gap-4">
+              <Link to={`/profile/${owner.username}`} className="flex items-center gap-2">
+                <img className="w-10 h-10 rounded-full" src={owner.avatar} alt="avatar" />
+                <span className="font-medium">{owner.username}</span>
+              </Link>
+              <div className="text-sm text-gray-500">Views: {video.views}</div>
             </div>
-            <div className='flex w-[100%]'>
-                <div className='w-[75%]   h-screen scroll-smooth  '>
-                    <div className='h-[100%] w-[100%]  flex justify-center items-start overflow-y-auto'>
-                        <div className='h-screen w-[95%] mt-[2%]flex-col space-y-4'>
-                            <div className='  w-[100%%]  rounded-lg '>
-                                {video.videoFile &&
-                                    <video className='w-[100%]' controls>
-                                        <source src={video.videoFile} type="video/mp4" />
-                                        Your browser does not support HTML video.
-                                    </video>
-                                }  {/* <video className="w-full h-full rounded-lg" controls>
-                                    <source src={video.videoFile} type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                </video> */}
-                            </div>
-                            <div className='p-3 bg-indigo-100 rounded-lg mt'>
-                                <div className='w-[100%]  items-center'>
-                                    <div className='px-8 py-3'>
-                                        <h1 className='items-center font-bold'>{video.title}</h1>
-
-                                    </div>
-                                    <Link to={`/profile/${owner.username}`} >
-                                    <div className='flex gap-2'>
-                                        <img className="w-10 h-10 rounded-full" src={owner.avatar} alt="Rounded avatar"></img>
-                                        <div>{owner.username}</div>
-                                    </div>
-                                    </Link>
-                                </div>
-                                <div className='w-[100%] flex gap-4 items-center justify-between'>
-                                    <div>
-                                        <nav>viwes {video.views}</nav>
-                                    </div>
-                                    <div className='flex items-center gap-4'>
-                                        <div onClick={likeHandle}>
-                                            <AiOutlineLike className={`text-xl  ${like ? "hidden" : "visible"}`} />
-                                            <AiFillLike className={`text-xl ${like ? "visible" : "hidden"}`} />
-                                            <nav>{video.videoLikedCount}</nav>
-                                        </div>
-                                        <div className={`p-2 text-white rounded-full cursor-pointer ${owner.isSubscribed ? "bg-indigo-950" : "bg-indigo-500"}`} onClick={subscribeHandle}>
-                                            Subscriber  {owner.subscriberCounts}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='w-[100%] flex gap-4 items-center'>
-                                    <div>
-
-                                    </div>
-                                    <div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='p-3 bg-indigo-100 rounded-lg mt'>
-                                <div className={`${description ? "bg-slate-400 p-3" : "p-3 bg-slate-400  w-fit"}`} onClick={() => setDescription(prev => !prev)}>
-                                    <button className=''>
-                                        description
-                                    </button>
-                                </div>
-                                <div className={`${description ? "visible" : "hidden "}`}>
-                                    commnents Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni incidunt illum iste ab reprehenderit! Autem, pariatur blanditiis adipisci cumque laboriosam deserunt provident, minus neque quis, rem dolore iste? Debitis, deserunt!
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis possimus alias dolor eos quis tempore animi suscipit? Incidunt sapiente laborum facilis nisi. Dignissimos, inventore modi necessitatibus soluta quibusdam culpa obcaecati!
-
-                                </div>
-                            </div>
-                            { video && <div className='w-full bg-white rounded-lg '>
-                                <div>
-                                <CommentForm video={video._id}/>
-                                </div>
-                                <div>
-                                    <CommentBox video={video._id}/>
-                                </div>
-                            </div>}
-
-
-                        </div>
-
-
-                    </div>
-                </div>
-                <div className='w-[25%] h-screen scroll-smooth bg-white flex justify-center overflow-y-auto'>
-
-                    <SidebarVideos />
-                </div>
+            <div className="flex items-center gap-6 mt-4">
+              <div onClick={handleLike} className="cursor-pointer flex items-center gap-1">
+                {like ? <AiFillLike className="text-blue-600 text-2xl" /> : <AiOutlineLike className="text-gray-600 text-2xl" />}
+                <span>{video.videoLikedCount}</span>
+              </div>
+              <button
+                onClick={handleSubscribe}
+                className={`px-4 py-2 rounded text-white ${owner.isSubscribed ? 'bg-gray-700' : 'bg-blue-600'} hover:opacity-80`}
+              >
+                Subscribe {owner.subscriberCounts}
+              </button>
             </div>
+          </div>
 
+          <div className="bg-white p-4 rounded-lg shadow">
+            <button
+              className="text-blue-600 font-semibold mb-2"
+              onClick={() => setDescriptionVisible((prev) => !prev)}
+            >
+              {descriptionVisible ? 'Hide Description' : 'Show Description'}
+            </button>
+            {descriptionVisible && <p className="text-gray-700">{video.description || 'No description provided.'}</p>}
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow space-y-4">
+            <CommentForm video={video._id} />
+            <CommentBox video={video._id} />
+          </div>
         </div>
 
-    )
-}
+        <div className="lg:w-1/4 w-full p-4 bg-white border-l rounded-lg shadow overflow-y-auto">
+          <SidebarVideos />
+        </div>
+      </div>
+    </div>
+  );
+};
 
-export default PlayVideo
+export default PlayVideo;

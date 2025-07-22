@@ -1,101 +1,73 @@
-import React, { useEffect, useState } from 'react'
-import Card from '../components/Card'
-import { IoIosLogOut } from "react-icons/io";
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../store/authSlice';
-import Profile from '../components/Profile.jsx'
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
+import AllVideos from '../components/AllVideos.jsx';
+import { logout } from '../store/authSlice.js';
 import { setMenuhandle } from '../store/navSlice.js';
 import { addVideos } from '../store/videoSlice.js';
-import AllVideos from '../components/AllVideos.jsx';
-
 
 const Home = () => {
-    const menuIcon = useSelector((state) => state.nav.menuState)
-    const userData = useSelector((state) => state.auth.userData)
-    const userstatus = useSelector((state) => state.auth.status)
-    const refresh = useSelector((state)=>state.video.allVideoStatus)
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    const getVideo = useSelector((state)=>state.video.allVideo)
+    const menuIcon = useSelector((state) => state.nav.menuState);
+    const userstatus = useSelector((state) => state.auth.status);
+    const refresh = useSelector((state) => state.video.allVideoStatus);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const logoutHandle = () => {
         axios.post('http://localhost:8000/api/v1/users/logout', null, {
             withCredentials: true
-        }).then((respose) => {
-            console.log(respose.data);
-            dispatch(logout())
-            navigate('/login')
-
-        }
-        ).catch((error) => {
+        }).then(() => {
+            dispatch(logout());
+            navigate('/login');
+        }).catch((error) => {
             console.log(error.message);
-        })
-    }
+        });
+    };
 
-    const getAllVideo = ()=>{
-        axios.post('http://localhost:8000/api/v1/videos/gelAllVideos',{isVideo:true}
-            ,{
+    const getAllVideo = () => {
+        axios.post('http://localhost:8000/api/v1/videos/gelAllVideos', { isVideo: true }, {
             withCredentials: true
-          }).then((responce)=>{
-            console.log(responce);
-            
-                dispatch(addVideos(responce.data.data))
-                // getVideo.map((video)=>{
-                //     console.log(video);
-                // })
-
-        }).catch((error)=>{
+        }).then((res) => {
+            dispatch(addVideos(res.data.data));
+        }).catch((error) => {
             console.log(error.message);
-        })
-    }
+        });
+    };
 
-    useEffect(()=>{
-        if(userstatus){
-        getAllVideo()
+    useEffect(() => {
+        if (userstatus) {
+            getAllVideo();
         }
-    },[userstatus,refresh])
-
+    }, [userstatus, refresh]);
 
     return (
-        <div className='w-full h-screen overflow-hidden '>
-
-
-            <div className='w-[100%] bg-white  flex justify-around flex-col relative h-[100%]'>
-                <div className='sticky top-0 z-50 h-[15%]'>
+        <div className="w-full h-screen overflow-hidden">
+            <div className="flex flex-col h-full bg-white">
+                <div className="sticky top-0 z-50">
                     <Navbar />
-
-
-
-
-
-
                 </div>
-                <div className='flex w-[100%] h-[85%] flex-1 bg-white'>
-
-                    <div className={ `sticky top-[15%] bottom-0 flex flex-col items-center justify-start w-[30%] h-screen gap-5 pt-6 font-semibold transition-all duration-300 ease-in-out delay-700 bg-slate-50 ${
-                        menuIcon? "visible":"hidden"
-                    }`}      >
-                        <div className={`p-2 rotate-90 shadow-md cursor-pointer hover:shadow-lg hover:text-indigo-500 bg-slate-50 visible relative md:left-[60px] top-1 `} onClick={() => dispatch(setMenuhandle())}>
-                            <span>X</span>
+                <div className="flex flex-1 bg-white">
+                    <div className={`sticky top-[70px] h-[calc(100vh-70px)] flex flex-col items-center w-[250px] bg-slate-50 shadow-md p-4 transition-all duration-300 ${menuIcon ? 'visible' : 'hidden'}`}>
+                        <div className="self-end mb-4 text-lg font-bold cursor-pointer hover:text-indigo-600" onClick={() => dispatch(setMenuhandle())}>
+                            X
                         </div>
-                        <div className='cursor-pointer hover:underline hover:text-gray-600'>Home</div>
-                        <div className='cursor-pointer hover:underline hover:text-gray-600'>Trend</div>
-                        <div className='cursor-pointer hover:underline hover:text-gray-600'>Song</div>
-                        <div className='cursor-pointer hover:underline hover:text-gray-600'>Movie</div>
-                        <div className='cursor-pointer hover:underline hover:text-gray-600'>Setting</div>
-
-
+                        <div className="flex flex-col gap-4 w-full text-center text-gray-700 font-medium">
+                            <div className="hover:bg-gray-200 py-2 rounded-md cursor-pointer">Home</div>
+                            <div className="hover:bg-gray-200 py-2 rounded-md cursor-pointer">Trend</div>
+                            <div className="hover:bg-gray-200 py-2 rounded-md cursor-pointer">Song</div>
+                            <div className="hover:bg-gray-200 py-2 rounded-md cursor-pointer">Movie</div>
+                            <div className="hover:bg-gray-200 py-2 rounded-md cursor-pointer">Setting</div>
+                        </div>
                     </div>
-                    <AllVideos/>
-                    
+                    <div className={`flex-1 px-6 py-4 overflow-y-auto ${menuIcon ? 'ml-[250px]' : ''}`}>
+                        <AllVideos />
+                    </div>
                 </div>
             </div>
-
         </div>
-    )
-}
+    );
+};
 
-export default Home
+export default Home;
