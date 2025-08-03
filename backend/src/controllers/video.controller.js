@@ -8,11 +8,11 @@ import { ApiResponse } from "../utils/ApiResponce.js";
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const {isVideo} = req.body
+    const { isVideo } = req.body
     //const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     const videos = await Video.find(
         {
-           isVideo:isVideo
+            isVideo: isVideo
         }
     )
 
@@ -32,7 +32,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
-    const { title, description,isVideo } = req.body
+    const { title, description, isVideo } = req.body
 
     if ([title, description].some((field) => field?.trim() === "")) {
         throw new ApiError(
@@ -68,7 +68,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         avatar: req.user.avatar,
         isPublished: true,
         duration: videoFile.duration,
-        isVideo:isVideo
+        isVideo: isVideo
     })
     //  console.log(video._id);
     return res
@@ -113,11 +113,22 @@ const getVideoById = asyncHandler(async (req, res) => {
 
             }
         },
-        
+        {
+            $lookup: {
+                from: "views",
+                localField: "_id",
+                foreignField: "video",
+                as: "videoViewList"
+            }
+        },
+
         {
             $addFields: {
                 videoLikedCount: {
                     $size: "$videoLikedList"
+                },
+                videoViews: {
+                    $size: "$videoViewList"
                 },
                 isLiked: {
                     $cond: {

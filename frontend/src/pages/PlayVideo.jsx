@@ -20,12 +20,21 @@ const PlayVideo = () => {
       const response = await axios.get(`/api/v1/videos/${videoId}`, { withCredentials: true });
       const videoData = response.data.data[0];
       setVideo(videoData);
+      
       setKey((prev) => prev + 1);
     } catch (error) {
       console.error(error.message);
     }
   };
-
+  const viewHandler = async () => {
+    try {
+      const response = await axios.get(`/api/v1/videos/views/${videoId}`, { withCredentials: true });
+      const Data = response.data;
+      
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
   const fetchOwner = async () => {
     if (video.owner) {
       try {
@@ -56,7 +65,9 @@ const PlayVideo = () => {
     }
   };
 
+
   useEffect(() => {
+    viewHandler();
     fetchVideo();
   }, [videoId]);
 
