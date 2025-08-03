@@ -4,11 +4,11 @@
   "description": "a backend",
   "type": "module",
   "main": "index.js",
+  
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "NODE_ENV=development nodemon backend/src/index.js",
     "start": "cross-env NODE_ENV=production node backend/src/index.js",
-    "build":"npm install && npm install --prefix frontend && npm vite build --prefix frontend"
+    "build": "npm install --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [
     "javascript",
