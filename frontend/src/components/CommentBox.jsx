@@ -16,7 +16,7 @@ const CommentBox = ({ video }) => {
     const data ={
       content
     }
-    axios.patch(`http://localhost:8000/api/v1/comment/c/${comment}`,data,{
+    axios.patch(`/api/v1/comment/c/${comment}`,data,{
       withCredentials:true
     })
     .then((response)=>{
@@ -31,7 +31,7 @@ const CommentBox = ({ video }) => {
 
   const deleteHandle=(comment)=>{
     console.log(comment);
-    axios.delete(`http://localhost:8000/api/v1/comment/c/${comment}`,{
+    axios.delete(`/api/v1/comment/c/${comment}`,{
       withCredentials:true
     }).then((response)=>{
       console.log(response.data);
@@ -44,7 +44,7 @@ const CommentBox = ({ video }) => {
   useEffect(() => {
     if (video) {
       const getComments = () => {
-        axios.get(`http://localhost:8000/api/v1/comment/${video}`, {
+        axios.get(`/api/v1/comment/${video}`, {
           withCredentials: true
         }).then((response) => {
           console.log(response.data.data)

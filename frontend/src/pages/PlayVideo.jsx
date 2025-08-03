@@ -17,7 +17,7 @@ const PlayVideo = () => {
 
   const fetchVideo = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/v1/videos/${videoId}`, { withCredentials: true });
+      const response = await axios.get(`/api/v1/videos/${videoId}`, { withCredentials: true });
       const videoData = response.data.data[0];
       setVideo(videoData);
       setKey((prev) => prev + 1);
@@ -29,7 +29,7 @@ const PlayVideo = () => {
   const fetchOwner = async () => {
     if (video.owner) {
       try {
-        const response = await axios.get(`http://localhost:8000/api/v1/users/c/${video.owner}`, { withCredentials: true });
+        const response = await axios.get(`/api/v1/users/c/${video.owner}`, { withCredentials: true });
         setOwner(response.data.data);
         setLike(video.isLiked);
       } catch (error) {
@@ -40,7 +40,7 @@ const PlayVideo = () => {
 
   const handleLike = async () => {
     try {
-      await axios.get(`http://localhost:8000/api/v1/like/c/${videoId}`, { withCredentials: true });
+      await axios.get(`/api/v1/like/c/${videoId}`, { withCredentials: true });
       setLike((prev) => !prev);
     } catch (error) {
       console.error(error.message);
@@ -49,7 +49,7 @@ const PlayVideo = () => {
 
   const handleSubscribe = async () => {
     try {
-      await axios.post(`http://localhost:8000/api/v1/subscribe/c/${owner._id}`, null, { withCredentials: true });
+      await axios.post(`/api/v1/subscribe/c/${owner._id}`, null, { withCredentials: true });
       fetchOwner();
     } catch (error) {
       console.error(error.message);

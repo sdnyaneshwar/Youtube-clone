@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../store/authSlice'
+
 const signUpImage = 'src/Photos/signup.jpg'
 
 const Login = () => {
@@ -23,7 +24,7 @@ const Login = () => {
         console.log(data);
 
 
-        axios.post('http://localhost:8000/api/v1/users/login', data)
+        axios.post('/api/v1/users/login', data)
             .then((response) => {
                 console.log(response.data);
                 const { accessToken, refreshToken } = response.data.data;

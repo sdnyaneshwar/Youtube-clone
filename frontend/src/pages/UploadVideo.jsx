@@ -22,7 +22,7 @@ const UploadVideo = () => {
     formdata.append("isVideo", isVideo);
 
     setLoading(true);
-    axios.post('http://localhost:8000/api/v1/videos', formdata, {
+    axios.post('/api/v1/videos', formdata, {
       withCredentials: true,
     })
       .then((response) => {

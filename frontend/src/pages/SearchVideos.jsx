@@ -11,7 +11,7 @@ const SearchVideos = () => {
     const getSearchVideos = () => {
         console.log(search);
 
-        axios.post(`http://localhost:8000/api/v1/videos/video/search/${search}`, {},
+        axios.post(`/api/v1/videos/video/search/${search}`, {},
             {
                 withCredentials: true
             }).then((response) => {

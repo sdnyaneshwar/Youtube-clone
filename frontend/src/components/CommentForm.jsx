@@ -10,7 +10,7 @@ const CommentForm = ({video}) => {
             content
         }
         
-        axios.post(`http://localhost:8000/api/v1/comment/${video}`,data,{
+        axios.post(`/api/v1/comment/${video}`,data,{
             withCredentials:true
         }).then((response)=>{
             // console.log(response.data);

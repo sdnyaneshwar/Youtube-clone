@@ -16,7 +16,7 @@ const Home = () => {
     const dispatch = useDispatch();
 
     const logoutHandle = () => {
-        axios.post('http://localhost:8000/api/v1/users/logout', null, {
+        axios.post('/api/v1/users/logout', null, {
             withCredentials: true
         }).then(() => {
             dispatch(logout());
@@ -27,7 +27,7 @@ const Home = () => {
     };
 
     const getAllVideo = () => {
-        axios.post('http://localhost:8000/api/v1/videos/gelAllVideos', { isVideo: true }, {
+        axios.post('/api/v1/videos/gelAllVideos', { isVideo: true }, {
             withCredentials: true
         }).then((res) => {
             dispatch(addVideos(res.data.data));

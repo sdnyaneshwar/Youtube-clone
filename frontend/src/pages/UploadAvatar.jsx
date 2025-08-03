@@ -15,7 +15,7 @@ const UploadAvatar = () => {
     const updateAvatar = () => {
         const formdata = new FormData();
         formdata.append("avatar", avatar)
-        axios.patch('http://localhost:8000/api/v1/users/avatar', formdata, {
+        axios.patch('/api/v1/users/avatar', formdata, {
             withCredentials: true
         },).then((response) => {
             console.log(response.data);

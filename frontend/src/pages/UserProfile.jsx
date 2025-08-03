@@ -9,7 +9,7 @@ const UserProfile = () => {
 
   const getUserProfile = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/v1/users/c/${username}`, {
+      const response = await axios.get(`/api/v1/users/c/${username}`, {
         withCredentials: true
       });
       setUser(response.data.data);
@@ -20,7 +20,7 @@ const UserProfile = () => {
 
   const getUserVideos = async (userId) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/v1/videos/user/${userId}`, {
+      const response = await axios.get(`/api/v1/videos/user/${userId}`, {
         withCredentials: true
       });
       setVideos(response.data.data);

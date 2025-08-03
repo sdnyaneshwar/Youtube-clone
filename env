@@ -1,6 +1,6 @@
 PORT=8000
 MONGODB_URL="mongodb+srv://dany:12345@cluster0.3e7f6pr.mongodb.net"
-CORS_ORIGIN=*
+CORS_ORIGIN=3000
 ACCESS_TOKEN_SECRET=chai-aur-code
 ACCESS_TOKEN_EXPIRY=1d
 REFRESH_TOKEN_SECRET=chai-aur-backend

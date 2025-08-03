@@ -15,7 +15,7 @@ const Reels = () => {
     useEffect(() => {
         const fetchVideos = async () => {
             try {
-                const response = await axios.post('http://localhost:8000/api/v1/videos/gelAllVideos', { isVideo: false }, {
+                const response = await axios.post('/api/v1/videos/gelAllVideos', { isVideo: false }, {
                     withCredentials: true
                 });
                 setVideos(response.data.data); // Adjust based on actual response structure

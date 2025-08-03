@@ -20,7 +20,7 @@ const Navbar = () => {
   const [mobileMenu, setMobileMenu] = useState(false);
 
   const logoutHandle = () => {
-    axios.post('http://localhost:8000/api/v1/users/logout', null, {
+    axios.post('/api/v1/users/logout', null, {
       withCredentials: true
     }).then(() => {
       navigate('/login');

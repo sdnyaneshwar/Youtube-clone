@@ -5,7 +5,9 @@ import { GoArrowLeft } from "react-icons/go";
 import axios from 'axios'
 import { Link,useNavigate } from 'react-router-dom';
 import {useDispatch} from 'react-redux'
-const signUpImage = 'src/Photos/signup.jpg'
+import signUpImage from '../Photos/signup.jpg'
+
+// const signUpImage = 'src/Photos/signup.jpg'
 
 const SignUp = () => {
     const dispatch = useDispatch()
@@ -34,7 +36,7 @@ const SignUp = () => {
         formdata.append("avatar",avatar)
         console.log(formdata);
 
-        const user = axios.post('http://localhost:8000/api/v1/users/register',formdata).then((response)=>{
+        const user = axios.post('/api/v1/users/register',formdata).then((response)=>{
             console.log(response.data);
             if(user){
                 dispatch(login({ userData: user.data }));
