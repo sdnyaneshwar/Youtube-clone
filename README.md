@@ -2,7 +2,7 @@
 
 A modern, responsive YouTube-like web app built with Vite + React. Browse videos, search, like, and explore a clean UI inspired by popular video platforms.
 
-Demo: https://rad-rolypoly-fc44d0.netlify.app/
+Demo: https://youtube-clone-helf.onrender.com
 
 Features:
 - Developed a video-sharing app with authentication, subscriptions, and comment features 
